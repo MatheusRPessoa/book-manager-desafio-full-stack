@@ -74,6 +74,11 @@
       {{ books.error }}
     </div>
 
+    <div v-if="deleteError" class="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
+      <AlertCircle :size="14" />
+      {{ deleteError }}
+    </div>
+
     <div v-else-if="!books.page?.content.length" class="flex flex-col items-center justify-center py-16 gap-3">
       <BookOpen :size="40" class="text-muted-foreground/40" />
       <p class="text-sm text-muted-foreground">Nenhum livro encontrado.</p>
@@ -114,13 +119,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { BookOpen, Plus, Search, Loader2, X, AlertCircle } from 'lucide-vue-next'
 import { useBooksStore } from '@/stores/books'
 import BookCard from '@/components/BookCard.vue'
 import type { BookFilters } from '@/services/books.service'
+import type { AxiosError } from 'axios'
 
 const books = useBooksStore()
+const deleteError = ref('')
 
 const filters = reactive<BookFilters>({
   title: '',
@@ -153,10 +160,12 @@ function clearFilters() {
 
 async function handleDelete(id: number) {
   if (confirm('Deseja excluir este livro?')) {
+    deleteError.value = ''
     try {
       await books.remove(id)
-    } catch {
-      alert('Erro ao excluir livro. Tente novamente.')
+    } catch (e) {
+      const err = e as AxiosError<{ error: string }>
+      deleteError.value = err.response?.data?.error ?? 'Erro ao excluir livro. Tente novamente.'
     }
   }
 }

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { booksService, type BookFilters } from '@/services/books.service'
 import type { Book, BookPayload, Page } from '@/types'
+import type { AxiosError } from 'axios'
 
 export const useBooksStore = defineStore('books', () => {
   const page = ref<Page<Book> | null>(null)
@@ -17,8 +18,9 @@ export const useBooksStore = defineStore('books', () => {
     error.value = null
     try {
       page.value = await booksService.list({ ...filters, page: pageNumber })
-    } catch {
-      error.value = 'Erro ao carregar livros. Tente novamente.'
+    } catch (e) {
+      const err = e as AxiosError<{ error: string }>
+      error.value = err.response?.data?.error ?? 'Erro ao carregar livros. Tente novamente.'
     } finally {
       loading.value = false
     }
