@@ -1,0 +1,45 @@
+# ========================
+# Backend (Java/Maven)
+# ========================
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+*.class
+*.jar
+*.war
+
+# ========================
+# Frontend (Node/Vite)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ========================
+# Ambiente
+# ========================
+.env
+.env.local
+.env.production
+
+# ========================
+# IDEs e editores
+# ========================
+.idea/
+.vscode/
+*.iml
+*.suo
+*.user
+
+# ========================
+# Sistema operacional
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/

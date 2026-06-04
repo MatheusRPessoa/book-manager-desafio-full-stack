@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bookmanager-db
+    environment:
+      POSTGRES_DB: bookmanager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: bookmanager-api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: Ym9vay1tYW5hZ2VyLXNlY3JldC1rZXktYXQtbGVhc3QtMzItY2hhcnM=
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookmanager
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8080
+    container_name: bookmanager-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
