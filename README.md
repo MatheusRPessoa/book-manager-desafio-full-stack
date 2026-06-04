@@ -1,89 +1,192 @@
-# 📘 Book Manager — Desafio Técnico Full-Stack
+# Book Manager — Desafio Técnico Full-Stack
 
-O objetivo do desafio é criar uma aplicação simples para gerenciamento de livros com autenticação JWT e CRUD completo.
+Aplicação full-stack para gerenciamento pessoal de livros com autenticação JWT, CRUD completo, paginação, filtros avançados e documentação interativa via Swagger.
 
-## Objetivo
-Construir uma aplicação full-stack chamada Book Manager, onde o usuário poderá:
+## Deploy
 
-- Criar conta
-- Fazer login
-- Listar livros
-- Criar livros
-- Editar livros
-- Excluir livros
+| Serviço | URL |
+|---|---|
+| Frontend | https://book-manager.up.railway.app |
+| Backend API | https://book-manager-api.up.railway.app |
+| Swagger UI | https://book-manager-api.up.railway.app/swagger-ui/index.html |
 
-As páginas internas devem ser protegidas por autenticação.
+---
 
-## Tecnologias Obrigatórias
-- Java + Spring Boot (backend)
-- Livre escolha (frontend)
-- Postgres ou MySQL
-  
-## Requisitos do Backend
+## Stack
 
-### Autenticação
-Implementar JWT com os endpoints:
+**Backend**
+- Java 21 + Spring Boot 3.2
+- Spring Security + JWT (HttpOnly cookie, `SameSite=None`)
+- Spring Data JPA + Hibernate
+- PostgreSQL
+- SpringDoc OpenAPI (Swagger UI)
+- Testcontainers (testes de integração com banco real)
 
-- /auth/register — Criar usuário
-- /auth/login — Retornar token JWT
+**Frontend**
+- Vue 3 + TypeScript
+- Vite + Tailwind CSS
+- Pinia (gerenciamento de estado)
+- Vee-validate + Zod (validação de formulários)
+- Axios
 
-Rotas de livros devem exigir autenticação.
+**Infraestrutura**
+- Docker + Docker Compose (ambiente local completo)
+- Railway (deploy backend + frontend + PostgreSQL)
 
-### CRUD de Livros
+---
 
-Rota      | Descrição |
------------|------------|
- /books    | Listar livros (com busca opcional por título) |
- /books/create    | Criar livro |
- /books/:id| Buscar por ID |
- /books/:id| Atualizar livro |
- /books/:id| Remover livro |
+## Diferenciais entregues
 
-### Modelo Book
-- title — string, obrigatório
-- author — string, obrigatório
-- year — number, opcional
-- description — string, opcional
+- **Dockerização completa** — backend, frontend e banco sobem com um único comando
+- **Deploy funcional** — aplicação disponível publicamente no Railway
+- **Paginação** — endpoint `/books` retorna `Page<BookResponse>` com suporte a `page`, `size` e `sort`
+- **Filtros avançados** — filtragem por título, autor e intervalo de ano de publicação
+- **Swagger/OpenAPI detalhado** — todos os endpoints, DTOs e modelos documentados com exemplos e constraints
+- **Isolamento de dados** — cada usuário visualiza e gerencia apenas seus próprios livros
+- **Testes de integração** — cobertura com banco real via Testcontainers (AuthControllerIT, BookControllerIT)
+- **Tratamento de erros** — `GlobalExceptionHandler` + estados de erro no frontend
+- **JWT via HttpOnly cookie** — mais seguro que localStorage; token não acessível por JavaScript
 
-### Banco
-- Usar Postgres ou MySQL
-- A estrutura do banco deve estar versionada no repositório:
-  - Um arquivo SQL com a criação das tabelas (ex: `schema.sql`)
+---
 
-## Requisitos do Frontend
+## Executar localmente
 
-Criar interface contendo:
+### Pré-requisitos
+- Docker e Docker Compose instalados
 
-### Páginas obrigatórias
-- /login
-- /books — listagem
-- /books/new — criação
-- /books/[id]/edit — edição
+### Subir tudo com Docker Compose
 
-### Funcionalidades
-- Autenticação e armazenamento do token
-- Proteção das páginas internas
-- Formulários funcionais
-- Busca de livros por título
-
-## O que será avaliado
-- Funcionamento do CRUD e autenticação
-- Organização e clareza do código
-- Boas práticas
-- Uso correto das tecnologias solicitadas
-- Estrutura de pastas backend/frontend
-
-### Diferenciais
-- Dockerização do frontend e/ou backend
-- Deploy funcional da aplicação (com link)
-- Paginação no endpoint de listagem de livros
-- Documentação da API via Swagger/OpenAPI
-  
-
+```bash
+docker compose up --build
 ```
 
-## Entrega
-Enviar o link do repositório contendo:
+| Serviço | URL local |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080 |
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
+| PostgreSQL | localhost:5432 |
 
-- Código do frontend e backend
-- README com instruções de execução
+### Executar backend sem Docker
+
+```bash
+# Sobe apenas o banco
+make db
+
+# Roda o backend com hot-reload
+make backend
+```
+
+### Rodar os testes
+
+```bash
+make test
+```
+
+Os testes de integração sobem um container PostgreSQL via Testcontainers automaticamente — não é necessário banco externo.
+
+---
+
+## Estrutura do projeto
+
+```
+book-manager/
+├── backend/
+│   ├── src/
+│   │   ├── main/java/com/bookmanager/
+│   │   │   ├── config/          # SecurityConfig, SwaggerConfig
+│   │   │   ├── controller/      # AuthController, BookController
+│   │   │   ├── dto/             # Request/Response DTOs com @Schema
+│   │   │   ├── entity/          # User, Book
+│   │   │   ├── exception/       # GlobalExceptionHandler
+│   │   │   ├── repository/      # BookRepository (JPQL com filtros)
+│   │   │   ├── security/        # JwtAuthFilter, JwtService
+│   │   │   └── service/         # AuthService, BookService
+│   │   └── resources/
+│   │       └── db/migration/schema.sql
+│   ├── src/test/                # Testes de integração
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # AppHeader, AppInput, BookCard, BookForm
+│   │   ├── layouts/             # AuthLayout, DefaultLayout
+│   │   ├── pages/               # LoginPage, RegisterPage, BooksPage, ...
+│   │   ├── services/            # api.ts, auth.service.ts, books.service.ts
+│   │   ├── stores/              # auth.ts, books.ts (Pinia)
+│   │   └── types/               # index.ts
+│   └── Dockerfile
+├── docker-compose.yml
+└── Makefile
+```
+
+---
+
+## API — Endpoints
+
+### Autenticação
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/register` | Criar conta |
+| POST | `/auth/login` | Login (retorna token JWT) |
+| POST | `/auth/logout` | Logout (limpa cookie) |
+
+### Livros (requer autenticação)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/books` | Listar com filtros e paginação |
+| GET | `/books/{id}` | Buscar por ID |
+| POST | `/books` | Criar livro |
+| PUT | `/books/{id}` | Atualizar livro |
+| DELETE | `/books/{id}` | Excluir livro |
+
+**Parâmetros de listagem:**
+
+| Parâmetro | Tipo | Descrição |
+|---|---|---|
+| `title` | string | Filtro parcial no título |
+| `author` | string | Filtro parcial no autor |
+| `yearFrom` | integer | Ano mínimo de publicação |
+| `yearTo` | integer | Ano máximo de publicação |
+| `page` | integer | Página (0-based) |
+| `size` | integer | Itens por página |
+| `sort` | string | Ex: `title,asc` |
+
+Documentação completa e interativa disponível no [Swagger UI](https://book-manager-api.up.railway.app/swagger-ui/index.html).
+
+---
+
+## Schema do banco
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS books (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    author VARCHAR(150) NOT NULL,
+    year INTEGER,
+    description TEXT,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## Variáveis de ambiente (backend)
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `SPRING_DATASOURCE_URL` | URL JDBC do PostgreSQL | `jdbc:postgresql://localhost:5432/bookmanager` |
+| `SPRING_DATASOURCE_USERNAME` | Usuário do banco | `postgres` |
+| `SPRING_DATASOURCE_PASSWORD` | Senha do banco | `postgres` |
+| `JWT_SECRET` | Chave secreta JWT (Base64) | valor de desenvolvimento |
+| `JWT_EXPIRATION` | Expiração do token em ms | `86400000` (24h) |
