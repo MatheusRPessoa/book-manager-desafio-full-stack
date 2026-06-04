@@ -6,7 +6,7 @@ Aplicação full-stack para gerenciamento pessoal de livros com autenticação J
 
 | Serviço | URL |
 |---|---|
-| Frontend | https://book-manager.up.railway.app |
+| Book Manager | https://book-manager.up.railway.app |
 | Swagger UI | https://book-manager-api.up.railway.app/swagger-ui/index.html |
 
 ---
