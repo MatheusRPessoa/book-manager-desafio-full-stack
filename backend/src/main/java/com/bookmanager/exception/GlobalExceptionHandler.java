@@ -28,13 +28,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(Map.of("error", "Access denied", "timestamp", Instant.now().toString()));
+                .body(Map.of("error", "Acesso negado", "timestamp", Instant.now().toString()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("error", "Invalid email or password", "timestamp", Instant.now().toString()));
+                .body(Map.of("error", "E-mail ou senha inválidos", "timestamp", Instant.now().toString()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -50,6 +50,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "An unexpected error occurred", "timestamp", Instant.now().toString()));
+                .body(Map.of("error", "Ocorreu um erro inesperado", "timestamp", Instant.now().toString()));
     }
 }
